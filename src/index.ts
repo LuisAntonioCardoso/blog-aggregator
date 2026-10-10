@@ -5,7 +5,10 @@ import {
   handlerLogin,
   handlerRegister,
   handlerReset,
-  handlerUsers
+  handlerUsers,
+  handlerAgg,
+  handlerAddFeed,
+  handlerFeeds
 } from './commands.js';
 
 async function main() {
@@ -20,6 +23,9 @@ async function main() {
   registerCommand(cmdReg, 'register', handlerRegister);
   registerCommand(cmdReg, 'reset', handlerReset);
   registerCommand(cmdReg, 'users', handlerUsers);
+  registerCommand(cmdReg, 'agg', handlerAgg);
+  registerCommand(cmdReg, 'addfeed', handlerAddFeed);
+  registerCommand(cmdReg, 'feeds', handlerFeeds);
 
   // run command
   const commandName = cliArgs[0];

@@ -1,5 +1,8 @@
+import { printFeed } from './aux';
 import { readConfig, setUser } from './config';
+import { createFeed, getFeedByUser } from './lib/db/queries/feed';
 import { createUser, getAllUsers, getUser, resetUsers } from './lib/db/queries/users';
+import { fetchFeed } from './xml';
 
 type CommandHandler = (commandName: string, ...agrs: string[]) => Promise<void>;
 export type CommandRegistry = Record<string, CommandHandler>;
@@ -61,5 +64,33 @@ export async function handlerUsers(_: string) {
       continue;
     }
     console.log(`* ${user.name}`);
+  }
+}
+
+export async function handlerAgg(_: string) {
+  console.log(JSON.stringify(await fetchFeed("https://www.wagslane.dev/index.xml")));
+}
+
+export async function handlerAddFeed(commandName: string, ...args: string[]) {
+  if (args.length !== 2)
+    throw new Error(`${commandName} command usage: ${commandName} <name> <url>`);
+  const [name, url] = args;
+
+  const user = await getUser(readConfig().currentUserName);
+  if (!user)
+    throw new Error(`Failed to get current user from DB`);
+
+  const feed = await createFeed(name, url, user.id);
+
+  printFeed(feed, user);
+}
+
+export async function handlerFeeds(_: string) {
+
+  const users = await getAllUsers();
+  for (const user of users) {
+    const feeds = await getFeedByUser(user.id);
+    for (const feed of feeds)
+      printFeed(feed, user);
   }
 }

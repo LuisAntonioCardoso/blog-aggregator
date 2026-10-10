@@ -73,3 +73,9 @@ is horrible.
 Then create a new registerHandler that has as command 'register' and takes 1 argument(name), and it register new users.
 It creates a new user in the db and set current user to be the one created and logs that the user was created.
 Test with a random user to check if it worked fine and then check the config and the db if it persisted.
+
+#### 3.1
+For the RSS feed, I'm using a XML structure for the data, and program will have RSSFeed and RSSItem types. Since we are not
+in the browser, instead of the DOMParser I'm using the fast-xml-parser to parse the XML.
+Learned about the 'User-Agent' header, that identifies "who" is doing the request, in this case, which app/program. I guess
+it is common practice to let the server know "who" is requesting.
