@@ -1,5 +1,6 @@
 import os from "os";
 import path from "path";
+import fs from "fs";
 
 type Config = {
   dbUrl: string,
@@ -7,15 +8,16 @@ type Config = {
 };
 
 export async function setUser(userName:string){
-  const currentConfig = await readConfig();
+  const currentConfig = readConfig();
   currentConfig['currentUserName']=userName;
   const newConfig = validateConfig(currentConfig);
   await writeConfig(newConfig);
 }
 
-export async function readConfig(): Config{
+export function readConfig(): Config{
   const configPath = getConfigFilePath();
-  const config = await Bun.file(configPath).json();
+  //const config = await Bun.file(configPath).json();     *** this is needed because I want to use this in drizzle.config and async calls there are not allowed
+  const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
   return validateConfig(config);
 }
 
