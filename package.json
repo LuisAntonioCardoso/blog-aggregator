@@ -9,9 +9,14 @@
   "devDependencies": {
     "@types/bun": "^1.4.2",
     "@types/node": "^26.6.4",
+    "drizzle-kit": "^0.31.11",
     "tsx": "^4.23.15"
   },
   "peerDependencies": {
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4",
+    "postgres": "^3.4.9"
   }
 }

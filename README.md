@@ -50,3 +50,15 @@ So currently I have a way to read and write the config file, I have infra around
 developed and developed with, following the right structure, and the program itself registers the only command, login,
 reads the given args, strips the first ones that are not relevant (we just need to know the command and the args), 
 and then runs the command with the given args. Currently, if the command does not exist, nothing happens, its just ignored.
+
+#### 2.1
+I guess that we are not using SQLite, its actually PostgreSQL instead.
+Just installed PostgreSQL and used the psql client to create a new db.
+
+#### 2.2
+To interact with the db we are using drizzle orm.
+Started by adding the users schema to the schema.ts on the project root folder, with: id(uuid), createdAt and updatedAt
+(timestamp defaulted to now, and updateAt change on entry update) and name(text).
+Changed the config to use the db connection instead of the placeholder: 
+'postgres://postgres:<pass>@localhost:5432/gator?sslmode=disable'
+sslmode is disable so that the application code does not try to use it locally.
