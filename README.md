@@ -62,3 +62,14 @@ Started by adding the users schema to the schema.ts on the project root folder, 
 Changed the config to use the db connection instead of the placeholder: 
 'postgres://postgres:<pass>@localhost:5432/gator?sslmode=disable'
 sslmode is disable so that the application code does not try to use it locally.
+
+#### 2.3
+I had to change the readConfig to use the sync file read from node instead of the async one from but to be able to use
+it in the drizzle.config. But now there is no way to run from the async functions without having to deal with potentially
+infinite nested callbacks, so commandHandler will now return Promise<void>.
+Now we create a DB object to interact with db using drizzle.
+The syntax is conceptually similar with SQL, but nauseating. I hope it gives some type checking benefits, else this
+is horrible.
+Then create a new registerHandler that has as command 'register' and takes 1 argument(name), and it register new users.
+It creates a new user in the db and set current user to be the one created and logs that the user was created.
+Test with a random user to check if it worked fine and then check the config and the db if it persisted.
