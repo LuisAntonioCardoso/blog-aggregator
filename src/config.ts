@@ -9,9 +9,8 @@ type Config = {
 
 export async function setUser(userName: string) {
   const currentConfig = readConfig();
-  currentConfig['currentUserName'] = userName;
-  const newConfig = validateConfig(currentConfig);
-  await writeConfig(newConfig);
+  currentConfig.currentUserName = userName;
+  await writeConfig(currentConfig);
 }
 
 export function readConfig(): Config {
@@ -31,17 +30,13 @@ async function writeConfig(config: Config) {
 }
 
 function validateConfig(rawConfig: any): Config {
-  if (!isConfig(rawConfig)) throw new Error('Invalid Config');
-  return rawConfig;
+  if (rawConfig === null || typeof rawConfig !== 'object' || rawConfig.dbUrl === null || typeof rawConfig.dbUrl !== 'string')
+    throw new Error("db_url is required in config file");
+
+  const config: Config = {
+    dbUrl: rawConfig.dbUrl,
+    currentUserName: rawConfig.currentConfig ?? '',
+  };
+  return config;
 }
 
-function isConfig(value: unknown): value is Config {
-  if (typeof value !== 'object') return false;
-  if (value === null) return false;
-  if (!('dbUrl' in value) || typeof value['dbUrl'] !== 'string') return false;
-  for (const key of Object.keys(value)) {
-    if (key === 'dbUrl' || (key === 'currentUserName' && typeof value[key] === 'string')) continue;
-    return false;
-  }
-  return true;
-}
