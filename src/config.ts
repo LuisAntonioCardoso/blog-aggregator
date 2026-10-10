@@ -35,7 +35,7 @@ function validateConfig(rawConfig: any): Config {
 
   const config: Config = {
     dbUrl: rawConfig.dbUrl,
-    currentUserName: rawConfig.currentConfig ?? '',
+    currentUserName: rawConfig.currentUserName ?? '',
   };
   return config;
 }
