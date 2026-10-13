@@ -79,3 +79,11 @@ For the RSS feed, I'm using a XML structure for the data, and program will have 
 in the browser, instead of the DOMParser I'm using the fast-xml-parser to parse the XML.
 Learned about the 'User-Agent' header, that identifies "who" is doing the request, in this case, which app/program. I guess
 it is common practice to let the server know "who" is requesting.
+
+#### 4.1
+Completely forgot about journaling the section 3.
+TLDR, implemented the rss feed parser, implemented a aux feedPrinter, created a db table to save the feeds with cascade delete
+from users to feeds, created commands to add a feed and to list all feeds.
+Now going to add functionality for users to also be able to follow feeds added by other users (currently impossible because
+feeds are unique). Going to create a relation table between users and feeds with unique pairs, with cascade delete from both
+the user side and the feed side.

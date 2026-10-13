@@ -1,7 +1,9 @@
 import { printFeed } from './aux';
 import { readConfig, setUser } from './config';
-import { createFeed, getFeedByUser } from './lib/db/queries/feed';
+import { createFeed, getFeedByUrl, getFeedsByUser } from './lib/db/queries/feed';
+import { createFeedFollow, getFeedFollowsForUser } from './lib/db/queries/feed_follows';
 import { createUser, getAllUsers, getUser, resetUsers } from './lib/db/queries/users';
+import { feed_follows } from './lib/db/schema';
 import { fetchFeed } from './xml';
 
 type CommandHandler = (commandName: string, ...agrs: string[]) => Promise<void>;
@@ -84,7 +86,11 @@ export async function handlerAddFeed(commandName: string, ...args: string[]) {
   if (!feed)
     throw new Error(`Failed to create feed`);
 
-  console.log(`Feed created successfully`);
+  const feedFollow = await createFeedFollow(user.id, feed.id);
+  if (!feedFollow)
+    throw new Error(`Failed to make user ${user.name} follow the created feed ${feed.name}`);
+
+  console.log(`Feed ${feed.name} created successfully by ${user.name}`);
   printFeed(feed, user);
 }
 
@@ -92,7 +98,7 @@ export async function handlerListFeeds(_: string) {
   const users = await getAllUsers();
   let printed = false;
   for (const user of users) {
-    const feeds = await getFeedByUser(user.id);
+    const feeds = await getFeedsByUser(user.id);
     for (const feed of feeds) {
       printed = true;
       printFeed(feed, user);
@@ -103,3 +109,33 @@ export async function handlerListFeeds(_: string) {
   if (!printed)
     console.log("No feeds found");
 }
+
+export async function handlerFollow(commandName: string, ...args: string[]) {
+  if (args.length !== 1)
+    throw new Error(`${commandName} command usage: ${commandName} <url>`);
+  const [url] = args;
+
+  const user = await getUser(readConfig().currentUserName);
+  if (!user)
+    throw new Error(`Failed to get current user from DB`);
+
+  const feed = await getFeedByUrl(url);
+  if (!feed)
+    throw new Error(`Failed to get feed with url ${url}`);
+
+  const feedFollow = await createFeedFollow(user.id, feed.id);
+  console.log(`${feedFollow.feedName, feedFollow.userName}`);
+}
+
+export async function handlerFollowing(_: string) {
+
+  const user = await getUser(readConfig().currentUserName);
+  if (!user)
+    throw new Error(`Failed to get current user from DB`);
+
+  const feedFollow = await getFeedFollowsForUser(user.id);
+
+  for (const pair of feedFollow)
+    console.log(`${pair.feedName}`);
+}
+

@@ -8,7 +8,9 @@ import {
   handlerUsers,
   handlerAgg,
   handlerAddFeed,
-  handlerListFeeds
+  handlerListFeeds,
+  handlerFollow,
+  handlerFollowing
 } from './commands.js';
 
 async function main() {
@@ -26,6 +28,8 @@ async function main() {
   registerCommand(cmdReg, 'agg', handlerAgg);
   registerCommand(cmdReg, 'addfeed', handlerAddFeed);
   registerCommand(cmdReg, 'feeds', handlerListFeeds);
+  registerCommand(cmdReg, 'follow', handlerFollow);
+  registerCommand(cmdReg, 'following', handlerFollowing);
 
   // run command
   const commandName = cliArgs[0];

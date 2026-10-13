@@ -7,8 +7,11 @@ export async function createFeed(name: string, url: string, user_id: string) {
   return result;
 }
 
-export async function getFeedByUser(userId: string) {
-  return await db.query.feeds.findMany({
-    where: eq(feeds.user_id, userId),
-  });
+export async function getFeedsByUser(userId: string) {
+  return await db.select().from(feeds).where(eq(feeds.user_id, userId));
+}
+
+export async function getFeedByUrl(url: string) {
+  const [result] = await db.select().from(feeds).where(eq(feeds.url, url));
+  return result;
 }
