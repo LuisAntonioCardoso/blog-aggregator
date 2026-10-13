@@ -68,7 +68,7 @@ export async function handlerUsers(_: string) {
 }
 
 export async function handlerAgg(_: string) {
-  console.log(JSON.stringify(await fetchFeed("https://www.wagslane.dev/index.xml")));
+  console.log(JSON.stringify(await fetchFeed("https://www.wagslane.dev/index.xml"), null, 2));
 }
 
 export async function handlerAddFeed(commandName: string, ...args: string[]) {
@@ -81,16 +81,25 @@ export async function handlerAddFeed(commandName: string, ...args: string[]) {
     throw new Error(`Failed to get current user from DB`);
 
   const feed = await createFeed(name, url, user.id);
+  if (!feed)
+    throw new Error(`Failed to create feed`);
 
+  console.log(`Feed created successfully`);
   printFeed(feed, user);
 }
 
-export async function handlerFeeds(_: string) {
-
+export async function handlerListFeeds(_: string) {
   const users = await getAllUsers();
+  let printed = false;
   for (const user of users) {
     const feeds = await getFeedByUser(user.id);
-    for (const feed of feeds)
+    for (const feed of feeds) {
+      printed = true;
       printFeed(feed, user);
+      console.log(`=====================================`);
+    }
   }
+
+  if (!printed)
+    console.log("No feeds found");
 }

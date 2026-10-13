@@ -21,16 +21,17 @@ export async function fetchFeed(feedURL: string) {
   const response = await fetch(feedURL, {
     headers: {
       'User-agent': 'gator',
+      accept: "application/rss+xml",
     },
   });
 
   if (!response.ok)
-    throw new Error(`Failed to fetch XML at: ${feedURL}`);
+    throw new Error(`Failed to fetch XML feed: ${response.status} ${response.statusText}`);
 
   const xml = await response.text();
   const parser = new XMLParser({ processEntities: false });
   const parsedXML = parser.parse(xml, true);
-  const channel = parsedXML.rss.channel;
+  const channel = parsedXML.rss?.channel;
 
   if (!channel)
     throw new Error("Invalid XML: 'channel' field required");
