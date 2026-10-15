@@ -1,7 +1,7 @@
 import { printFeed } from './aux';
 import { readConfig, setUser } from './config';
 import { createFeed, getFeedByUrl, getFeedsByUser } from './lib/db/queries/feed';
-import { createFeedFollow, getFeedFollowsForUser } from './lib/db/queries/feed_follows';
+import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from './lib/db/queries/feed_follows';
 import { createUser, getAllUsers, getUser, resetUsers } from './lib/db/queries/users';
 import { User } from './lib/db/schema';
 import { fetchFeed } from './xml';
@@ -99,9 +99,9 @@ export async function handlerAddFeed(commandName: string, user: User, ...args: s
 
   const feedFollow = await createFeedFollow(user.id, feed.id);
   if (!feedFollow)
-    throw new Error(`Failed to make user ${user.name} follow the created feed ${feed.name}`);
+    throw new Error(`Failed to make user ${user.name} follow the created feed "${feed.name}"`);
 
-  console.log(`Feed ${feed.name} created successfully by ${user.name}`);
+  console.log(`Feed "${feed.name}" created and followed successfully by ${user.name}`);
   printFeed(feed, user);
 }
 
@@ -140,5 +140,21 @@ export async function handlerFollowing(_: string, user: User) {
 
   for (const pair of feedFollow)
     console.log(`${pair.feedName}`);
+}
+
+export async function handlerUnfollow(commandName: string, user: User, ...args: string[]) {
+  if (args.length !== 1)
+    throw new Error(`${commandName} command usage: ${commandName} <url>`);
+  const url = args[0];
+
+  const feed = await getFeedByUrl(url);
+  if (!feed)
+    throw new Error(`Failed to get feed with url ${url}`);
+
+  const deleted = await deleteFeedFollow(user.id, feed.id)
+  if (!deleted)
+    throw new Error(`Failed to delete feed with url ${url}`);
+
+  console.log(`successfully deleted feed "${feed.name}"`)
 }
 
