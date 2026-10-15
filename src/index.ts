@@ -10,7 +10,8 @@ import {
   handlerAddFeed,
   handlerListFeeds,
   handlerFollow,
-  handlerFollowing
+  handlerFollowing,
+  middlewareLoggedIn
 } from './commands.js';
 
 async function main() {
@@ -26,10 +27,10 @@ async function main() {
   registerCommand(cmdReg, 'reset', handlerReset);
   registerCommand(cmdReg, 'users', handlerUsers);
   registerCommand(cmdReg, 'agg', handlerAgg);
-  registerCommand(cmdReg, 'addfeed', handlerAddFeed);
+  registerCommand(cmdReg, 'addfeed', middlewareLoggedIn(handlerAddFeed));
   registerCommand(cmdReg, 'feeds', handlerListFeeds);
-  registerCommand(cmdReg, 'follow', handlerFollow);
-  registerCommand(cmdReg, 'following', handlerFollowing);
+  registerCommand(cmdReg, 'follow', middlewareLoggedIn(handlerFollow));
+  registerCommand(cmdReg, 'following', middlewareLoggedIn(handlerFollowing));
 
   // run command
   const commandName = cliArgs[0];

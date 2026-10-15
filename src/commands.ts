@@ -88,14 +88,10 @@ export async function handlerAgg(_: string) {
   console.log(JSON.stringify(await fetchFeed("https://www.wagslane.dev/index.xml"), null, 2));
 }
 
-export async function handlerAddFeed(commandName: string, ...args: string[]) {
+export async function handlerAddFeed(commandName: string, user: User, ...args: string[]) {
   if (args.length !== 2)
     throw new Error(`${commandName} command usage: ${commandName} <name> <url>`);
   const [name, url] = args;
-
-  const user = await getUser(readConfig().currentUserName);
-  if (!user)
-    throw new Error(`Failed to get current user from DB`);
 
   const feed = await createFeed(name, url, user.id);
   if (!feed)
@@ -125,14 +121,10 @@ export async function handlerListFeeds(_: string) {
     console.log("No feeds found");
 }
 
-export async function handlerFollow(commandName: string, ...args: string[]) {
+export async function handlerFollow(commandName: string, user: User, ...args: string[]) {
   if (args.length !== 1)
     throw new Error(`${commandName} command usage: ${commandName} <url>`);
   const [url] = args;
-
-  const user = await getUser(readConfig().currentUserName);
-  if (!user)
-    throw new Error(`Failed to get current user from DB`);
 
   const feed = await getFeedByUrl(url);
   if (!feed)
@@ -142,11 +134,7 @@ export async function handlerFollow(commandName: string, ...args: string[]) {
   console.log(`${feedFollow.feedName, feedFollow.userName}`);
 }
 
-export async function handlerFollowing(_: string) {
-
-  const user = await getUser(readConfig().currentUserName);
-  if (!user)
-    throw new Error(`Failed to get current user from DB`);
+export async function handlerFollowing(_: string, user: User) {
 
   const feedFollow = await getFeedFollowsForUser(user.id);
 
