@@ -98,3 +98,10 @@ In this case, we are using it as a higher order function that will wrap the comm
 
 #### 4.3
 Added functionality to unfollow feeds.
+
+#### 5.1
+Now lets get back to the aggregate command and complete it by fetching the posts from the feeds.
+To do that, first we are adding a mutation feeds, to track when was the last time it was fetched (fetched_at).
+Create a query to mark feed as fetched by updating fetched_at with current time stamp.
+Now the agg(agregate) command will get a time duration as argument that will set a timer to run 'scrapeFeeds'.
+Save the timer id and stop it when the program is killed.
