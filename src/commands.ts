@@ -3,11 +3,26 @@ import { readConfig, setUser } from './config';
 import { createFeed, getFeedByUrl, getFeedsByUser } from './lib/db/queries/feed';
 import { createFeedFollow, getFeedFollowsForUser } from './lib/db/queries/feed_follows';
 import { createUser, getAllUsers, getUser, resetUsers } from './lib/db/queries/users';
-import { feed_follows } from './lib/db/schema';
+import { User } from './lib/db/schema';
 import { fetchFeed } from './xml';
 
 type CommandHandler = (commandName: string, ...agrs: string[]) => Promise<void>;
+type UserCommandHandler = (commandName: string, user: User, ...args: string[]) => Promise<void>;
 export type CommandRegistry = Record<string, CommandHandler>;
+
+export function middlewareLoggedIn(handler: UserCommandHandler) {
+  return (async (commandName: string, ...args: string[]) => {
+    const name = readConfig().currentUserName;
+    if (!name)
+      throw new Error("No current user");
+
+    const user = await getUser(name);
+    if (!user) {
+      throw new Error(`Failed to fetch current user from BD`);
+    }
+    return handler(commandName, user, ...args);
+  });
+}
 
 export function registerCommand(registry: CommandRegistry, commandName: string, handler: CommandHandler) {
   registry[commandName] = handler;
@@ -19,19 +34,6 @@ export async function runCommand(registry: CommandRegistry, commandName: string,
     throw new Error(`Unknown command: ${commandName}`);
 
   await handler(commandName, ...args);
-}
-
-export async function handlerLogin(commandName: string, ...args: string[]) {
-  if (args.length !== 1)
-    throw new Error(`${commandName} command usage: ${commandName} <name>`);
-  const username = args[0];
-
-  let user = await getUser(username);
-  if (!user)
-    throw new Error(`User ${username} not registered`);
-
-  setUser(username);
-  console.log(`User ${username} has been set`);
 }
 
 export async function handlerRegister(commandName: string, ...args: string[]) {
@@ -49,6 +51,19 @@ export async function handlerRegister(commandName: string, ...args: string[]) {
 
   setUser(newUser.name);
   console.log(`User ${username} created successfully`);
+}
+
+export async function handlerLogin(commandName: string, ...args: string[]) {
+  if (args.length !== 1)
+    throw new Error(`${commandName} command usage: ${commandName} <name>`);
+  const username = args[0];
+
+  let user = await getUser(username);
+  if (!user)
+    throw new Error(`User ${username} not registered`);
+
+  setUser(username);
+  console.log(`User ${username} has been set`);
 }
 
 export async function handlerReset(_: string) {

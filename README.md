@@ -87,3 +87,11 @@ from users to feeds, created commands to add a feed and to list all feeds.
 Now going to add functionality for users to also be able to follow feeds added by other users (currently impossible because
 feeds are unique). Going to create a relation table between users and feeds with unique pairs, with cascade delete from both
 the user side and the feed side.
+
+#### 4.2
+Now that we reached a point where multiple commands always start by doing the exact same things (for example getting the user),
+we want to extract/abstract that logic to its own function. In this case, given its nature, it has a special name: middleware.
+As the name suggests, middleware is code that act as a pre-fix of the code that we actually want to run, very commonly used 
+for things like authentication/authorization.
+In this case, we are using it as a higher order function that will wrap the command that need to access the user, turning
+'UserCommandHandler's to normal 'CommandHandler's.
