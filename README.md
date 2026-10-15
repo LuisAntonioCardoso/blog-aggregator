@@ -95,3 +95,6 @@ As the name suggests, middleware is code that act as a pre-fix of the code that 
 for things like authentication/authorization.
 In this case, we are using it as a higher order function that will wrap the command that need to access the user, turning
 'UserCommandHandler's to normal 'CommandHandler's.
+
+#### 4.3
+Added functionality to unfollow feeds.
