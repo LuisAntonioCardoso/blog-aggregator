@@ -1,4 +1,4 @@
-import { printFeed } from './aux';
+import { parseDuration, printFeed, scrapeFeeds } from './aux';
 import { readConfig, setUser } from './config';
 import { createFeed, getFeedByUrl, getFeedsByUser } from './lib/db/queries/feed';
 import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from './lib/db/queries/feed_follows';
@@ -84,7 +84,24 @@ export async function handlerUsers(_: string) {
   }
 }
 
-export async function handlerAgg(_: string) {
+export async function handlerAgg(commandName: string, ...args: string[]) {
+  if (args.length !== 1)
+    throw new Error(`${commandName} command usage: ${commandName} <time between fetches>`);
+  const [durationString] = args;
+  const [parsed, timeInBetween] = parseDuration(durationString);
+
+  console.log(`Collecting feeds every ${parsed}`);
+
+  scrapeFeeds()
+  const intervalId = setInterval(scrapeFeeds, timeInBetween);
+  await new Promise<void>((resolve) => {
+    process.on("SIGINT", () => {
+      console.log("Shutting down feed aggregator...");
+      clearInterval(intervalId);
+      resolve();
+    });
+  });
+
   console.log(JSON.stringify(await fetchFeed("https://www.wagslane.dev/index.xml"), null, 2));
 }
 
