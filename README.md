@@ -105,3 +105,11 @@ To do that, first we are adding a mutation feeds, to track when was the last tim
 Create a query to mark feed as fetched by updating fetched_at with current time stamp.
 Now the agg(agregate) command will get a time duration as argument that will set a timer to run 'scrapeFeeds'.
 Save the timer id and stop it when the program is killed.
+
+#### 5.2
+Now we are going to also save in the db the posts from the feeds.
+Added new db table for posts with title, url, description, published_at and feed_id. Added a createPost and getPostForUser 
+with a number of post argument (but not required).
+Updated the scrapper to save the posts.
+Needed to create a function to parse the published_at info from the post fetch, because they are not always formatted the same.
+Added browser command to list users posts that should be able to take an optional 'limit' parameter that defaults to 2.
