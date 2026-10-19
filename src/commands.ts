@@ -2,6 +2,7 @@ import { parseDuration, printFeed, scrapeFeeds } from './aux';
 import { readConfig, setUser } from './config';
 import { createFeed, getFeedByUrl, getFeedsByUser } from './lib/db/queries/feed';
 import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from './lib/db/queries/feed_follows';
+import { getPostForUser } from './lib/db/queries/posts';
 import { createUser, getAllUsers, getUser, resetUsers } from './lib/db/queries/users';
 import { User } from './lib/db/schema';
 import { fetchFeed } from './xml';
@@ -173,5 +174,23 @@ export async function handlerUnfollow(commandName: string, user: User, ...args: 
     throw new Error(`Failed to delete feed with url ${url}`);
 
   console.log(`successfully deleted feed "${feed.name}"`)
+}
+
+export async function handlerBrowse(commandName: string, ...args: string[]) {
+  if (args.length > 1)
+    throw new Error(`${commandName} command usage: ${commandName} [number of posts]`);
+
+  let limit = 2;
+  if (args.length === 1) {
+    const parsed = Number(args[0]);
+    if (Number.isNaN(parsed))
+      throw new Error(`${commandName} command usage: ${commandName} [number of posts]. [number of posts] needs to be a valid number`);
+    limit = parsed;
+  }
+
+  const posts = await getPostForUser(limit);
+  for (const post of posts) {
+    console.log(post);
+  }
 }
 

@@ -8,7 +8,7 @@ type NewPost = Omit<
 >;
 
 export async function createPost(data: NewPost) {
-  const [post] = await db.insert(posts).values(data).returning();
+  const [post] = await db.insert(posts).values(data).onConflictDoNothing({ target: posts.url }).returning();
   return post;
 }
 

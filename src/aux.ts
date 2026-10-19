@@ -1,4 +1,5 @@
 import { getNextFeedToFetch, markFeedToFetch } from "./lib/db/queries/feed";
+import { createPost } from "./lib/db/queries/posts";
 import { User, Feed } from "./lib/db/schema";
 import { fetchFeed } from "./xml";
 
@@ -21,13 +22,22 @@ export async function scrapeFeeds() {
     console.error(`Failed attempt to fetch feed ${feed.name} at ${feed.url}`);
     return;
   }
+  console.log(` ** Fetched feed ${feed.id}:${fetchedFeed.channel.title}`);
 
   const marked = await markFeedToFetch(feed.id);
   if (!marked)
     throw new Error(`Failed to fetch feed "${feed.name}" at ${feed.url}`);
 
+  console.log(` ** ${feed.id}:${fetchedFeed.channel.title} marked as fetched`);
+
   for (const item of fetchedFeed.channel.item) {
-    console.log(item.title);
+    await createPost({
+      title: item.title,
+      url: item.link,
+      description: item.description,
+      published_at: new Date(item.pubDate),
+      feed_id: feed.id
+    });
   }
 }
 
@@ -54,3 +64,4 @@ export function parseDuration(durationStr: string): [string, number] {
   }
   throw new Error('Parse wrong unit');
 }
+

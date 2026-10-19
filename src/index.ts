@@ -12,7 +12,8 @@ import {
   handlerFollow,
   handlerFollowing,
   middlewareLoggedIn,
-  handlerUnfollow
+  handlerUnfollow,
+  handlerBrowse
 } from './commands.js';
 
 async function main() {
@@ -33,6 +34,7 @@ async function main() {
   registerCommand(cmdReg, 'follow', middlewareLoggedIn(handlerFollow));
   registerCommand(cmdReg, 'following', middlewareLoggedIn(handlerFollowing));
   registerCommand(cmdReg, 'unfollow', middlewareLoggedIn(handlerUnfollow));
+  registerCommand(cmdReg, 'browse', handlerBrowse);
 
   // run command
   const commandName = cliArgs[0];
